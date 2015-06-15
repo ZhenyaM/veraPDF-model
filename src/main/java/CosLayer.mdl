@@ -14,7 +14,7 @@ type CosObject extends Object {
 type CosDocument extends CosObject {
 	% number of indirect objects in the document
 	property nrIndirects: Integer;
-	% size of the byte sequence representing the document 
+	% size of the byte sequence representing the document
 	property size: Integer;
 	% true if the OCProperties key is present in the document Catalog
 	property isOptionalContentPresent: Boolean;
@@ -28,11 +28,9 @@ type CosDocument extends CosObject {
 	property lastID: String;
 	% true if the document is linearized
 	property isLinearized: Boolean;
-	% link to all embedded file specifications
-	link EmbeddedFiles: CosFileSpecification;
 	% link to the document cross reference table
 	link xref: CosXRef;
-	% trailer dictionary (first page trailier for the linearized PDF or the last trailer in the document)
+	% trailer dictionary (first page trailer for the linearized PDF or the last trailer in the document)
 	link trailer: CosTrailer;
 	% all indirect objects referred from the xref table
 	link indirectObjects: CosIndirect+;
@@ -48,7 +46,7 @@ type CosDocument extends CosObject {
 type CosIndirect extends CosObject {
 	% the direct contents of the indirect object
 	link directObject: CosObject;
-	% true if the specings around object number, generation number, keywords 'obj' and 'endobj' comply to PDF/A standard
+	% true if the spacings around object number, generation number, keywords 'obj' and 'endobj' comply to PDF/A standard
 	property spacingCompliesPDFA: Boolean;
 }
 

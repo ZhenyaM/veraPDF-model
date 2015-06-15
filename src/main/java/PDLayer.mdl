@@ -11,6 +11,8 @@ type PDObject extends Object {
 
 % the class corresponding to the high level PDF document structure 
 type PDDocument extends PDObject {
+	% link to all embedded file specifications
+	link EmbeddedFiles: CosFileSpecification;
 	% the collection of all document pages
 	link pages: PDPage+;
 	% document level metadata

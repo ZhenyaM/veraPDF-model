@@ -1,10 +1,14 @@
 package org.verapdf.model.pdlayer;
 
 import org.verapdf.model.baselayer.Object;
+import org.verapdf.model.coslayer.CosDict;
+import org.verapdf.model.coslayer.CosStream;
 import org.verapdf.model.operator.Operator;
-import java.util.List;
+import org.verapdf.model.external.ICCOutputProfile;
+import org.verapdf.model.external.ICCInputProfile;
 
-% base class for all PD layer obejcts	
+
+% base class for all PD layer objects	
 type PDObject extends Object {
 	
 }
@@ -29,6 +33,8 @@ type PDPage extends PDObject {
 	link annots: PDAnnot*;
 	% document level action
 	link action: PDAction?;
+	% page content stream
+	link contentStream: PDContentStream;
 }
 
 % the object representing content stream together with the resource dictionary
@@ -37,18 +43,143 @@ type PDContentStream extends PDObject {
 	link operators: Operator*;
 }
 
-% the annotation object	
+% PDF resource object
+type PDResource extends PDObject {
+
+}
+
+% Color space object
+type PDColorSpace extends PDResource {
+	% number of components
+	property nrComponents: Integer;
+}
+
+% DeviceGray color space
+type PDDeviceGray extends PDColorSpace {
+
+}
+
+% DeviceRGB color space
+type PDDeviceRGB extends PDColorSpace {
+
+}
+
+% DeviceCMYK color space
+type PDDeviceCMYK extends PDColorSpace {
+
+}
+
+% ICCBased color space
+type PDICCBased extends PDColorSpace {
+	% embedded ICC profile
+	link iccProfile: ICCInputProfile;
+}
+
+% Lab color space
+type PDLab extends PDColorSpace {
+
+}
+
+% CalGray color space
+type PDCalGray extends PDColorSpace {
+
+}
+
+% CalRGB color space
+type PDCalRGB extends PDColorSpace {
+
+}
+
+% Separation color space
+type PDSeparation extends PDColorSpace {
+	% alternate color space
+	link alternate: PDColorSpace;
+}
+
+% DeviceN color space
+type PDDeviceN extends PDColorSpace {
+	% alternate color space
+	link alternate: PDColorSpace;
+}
+
+% Indexed color space
+type PDIndexed extends PDColorSpace {
+	% base color space
+	link base: PDColorSpace;
+}
+
+% generic Pattern type
+type PDPattern extends PDResource {
+
+}
+
+% tiling Pattern
+type PDTilingPattern extends PDPattern {
+	% content stream of the pattern
+	link contentStream: PDContentStream;
+}
+
+% shading Pattern
+type PDShadingPattern extends PDPattern {
+	% shading object
+	link shading: PDShading;
+}
+
+% XObject resource
+type PDXObject extends PDResource {
+	% subtype of the XObject resource (Image, Form, PS)
+	property Subtype: String;
+	% link to the OPI dictionary (OPI key in the XObject dictionary)
+	link OPI: CosDict?;
+}
+
+% Image XObject
+type PDXImage extends PDXObject {
+	% image color space
+	link imageCS: PDColorSpace;
+	% Interpolate key in the image dictionary
+	property Interpolate: Boolean;
+	% image alternates (Alternates key in Image dictionary)
+	link Alternates: PDXImage*;
+}
+
+% Form XObject
+type PDXForm extends PDXObject {
+	% value of the Subtype2 key
+	property Subtype2: String;
+	% link to the PostScript stream (PS key in PDF 1.0)
+	link PS: CosStream?;
+	% link to the reference XObject (Ref key in the form XObject dictionary)
+	link Ref: CosDict?;
+	% form content
+	link contentStream: PDContentStream;
+}
+
+% ExtGState dictionary
+type PDExtGState extends PDResource {
+
+}
+
+% Shading resource
+type PDShading extends PDResource {
+	% shading color space
+	link colorSpace: PDColorSpace;
+}
+
+% annotation object	
 type PDAnnot extends PDObject {
 	% annotation subtype
 	property Subtype: String;
+	% appearance stream
+	link appearance: PDContentStream?;
 }
 
-% the PDF form field or AcroForm
+% PDF interactive form (or AcroForm)
 type PDAcroForm extends PDObject {
 	
 }
 	
-% the PDF action obejct
+% the PDF action object
 type PDAction extends PDObject {
 	% action subtype
 	property Subtype: String;
@@ -57,13 +188,12 @@ type PDAction extends PDObject {
 
 
 % the XMP Metadata stream
-type PDMetadata extends PDObject
-{
+type PDMetadata extends PDObject {
 	
 }
 
 % the output intent dictionary
-type PDOutputIntent extends PDObject
-{
-	
+type PDOutputIntent extends PDObject {
+	% destination output profile
+	link destProfile: ICCOutputProfile?;
 }

@@ -1,10 +1,349 @@
 package org.verapdf.model.operator;
 
 import org.verapdf.model.baselayer.Object;
-import org.verapdf.model.pdlayer.*;
-import java.util.List;
+import org.verapdf.model.coslayer.CosInteger;
+import org.verapdf.model.coslayer.CosReal;
+import org.verapdf.model.coslayer.CosName;
+import org.verapdf.model.coslayer.CosDict;
+import org.verapdf.model.coslayer.CosRenderingIntent;
+
+import org.verapdf.model.pdlayer.PDColorSpace;
+import org.verapdf.model.pdlayer.PDExtGState;
+import org.verapdf.model.pdlayer.PDXObject;
+import org.verapdf.model.pdlayer.PDShading;
 
 % base class for all operators in the content stream
 type Operator extends Object {
 	
+}
+
+% General graphics state operators
+type OpGeneralGS extends Operator {
+
+}
+
+% we define arguments as links to the Cos objects rather than than simple properties 
+% because they shall be checked for implementation limits
+
+% set line width operator
+type Op_w_line_width extends OpGeneralGS {
+	% line width
+	link lineWidth: CosReal;
+}
+
+% set line cap operator
+type Op_J_line_cap extends OpGeneralGS {
+	% line cap
+	link lineCap: CosInteger;
+}
+
+% set line join operator
+type Op_j_line_join extends OpGeneralGS {
+	% line join
+	link lineJoin: CosInteger;
+}
+
+% miter limit operator
+type Op_M extends OpGeneralGS {
+	% miter limit
+	link miterLimit: CosReal;
+}
+
+% set dash pattern operator
+type Op_d extends OpGeneralGS {
+	% dash array
+	link dashArray: CosReal*;
+	% dash phase
+	link dashPhase: CosReal;
+}
+
+% rendering intent operator
+type Op_ri extends OpGeneralGS {
+	% rendering intent
+	link renderingIntent: CosRenderingIntent;
+}
+
+% flatness operator
+type Op_i extends OpGeneralGS {
+	% flatness
+	link flatness: CosReal;
+}
+
+% extended graphics state operator
+type Op_gs extends OpGeneralGS {
+	% ExtGState dictionary
+	link extGState: PDExtGState;
+}
+
+% Special graphics state operators
+type OpSpecialGS extends Operator {
+
+}
+
+% gsave operator
+type Op_q extends OpSpecialGS {
+	% the number of nested g/Q pair (subject to implementation limits)
+	property nestingLevel: Integer;
+}
+
+% grestore operator
+type Op_Q extends OpSpecialGS {
+
+}
+
+% current transformation matrix
+type Op_cm extends OpSpecialGS {
+	% the coefficients of the concatenation matrix
+	link matrix: CosReal+;
+}
+
+% Path construction operators
+type OpPathConstruction extends Operator {
+
+}
+
+% moveto operator
+type Op_m extends OpPathConstruction {
+	% operator arguments
+	link point: CosReal+;
+}
+
+% lineto operator
+type Op_l extends OpPathConstruction {
+	% operator arguments
+	link point: CosReal+;
+}
+
+% curveto operator
+type Op_c extends OpPathConstruction {
+	% operator arguments
+	link controlPoints: CosReal+;
+}
+
+% special curveto operator
+type Op_v extends OpPathConstruction {
+	% operator arguments
+	link controlPoints: CosReal+;
+}
+
+% special curveto operator
+type Op_y extends OpPathConstruction {
+	% operator arguments
+	link controlPoints: CosReal+;
+}
+
+% close subpath operator
+type Op_h extends OpPathConstruction {
+
+}
+
+% rect operator
+type Op_re extends OpPathConstruction {
+	% rectangle box
+	link rectBox: CosReal+;
+}
+
+% Path paint operators
+type OpPathPaint extends Operator {
+
+}
+
+% path close and stroke operator
+type Op_s_close_stroke extends OpPathPaint {
+	% stroke color space
+	link strokeCS: PDColorSpace;
+}
+
+% path stroke operator
+type Op_S_stroke extends OpPathPaint {
+	% stroke color space
+	link strokeCS: PDColorSpace;
+}
+
+% path fill operator
+type Op_f_fill extends OpPathPaint {
+	% fill color space
+	link fillCS: PDColorSpace;
+}
+
+% another path fill operator
+type Op_F_fill_obsolete extends OpPathPaint {
+	% fill color space
+	link fillCS: PDColorSpace;
+}
+
+% path fill (even-odd rule) operator
+type Op_FStar extends OpPathPaint {
+	% fill color space
+	link fillCS: PDColorSpace;	
+}
+
+% path fill and stroke operator
+type Op_B_eofill_stroke extends OpPathPaint {
+	% fill color space
+	link fillCS: PDColorSpace;
+	% stroke color space
+	link strokeCS: PDColorSpace;		
+}
+
+% path fill (even-odd rule) and stroke operator
+type Op_BStar extends OpPathPaint {
+	% fill color space
+	link fillCS: PDColorSpace;
+	% stroke color space
+	link strokeCS: PDColorSpace;		
+}
+
+% path close, fill and stroke operator
+type Op_b_fill_stroke extends OpPathPaint {
+	% fill color space
+	link fillCS: PDColorSpace;
+	% stroke color space
+	link strokeCS: PDColorSpace;		
+}
+
+% path close, fill (even-odd rule) and stroke operator
+type Op_bstar extends OpPathPaint {
+	% fill color space
+	link fillCS: PDColorSpace;
+	% stroke color space
+	link strokeCS: PDColorSpace;		
+}
+
+% path painting no-op
+type Op_n extends OpPathPaint {
+ 
+}
+
+% Clip operators
+type OpClip extends Operator {
+
+}
+
+% clip (non-zero rule)
+type Op_W_clip extends OpClip {
+
+}
+
+% clip (even-odd rule)
+type Op_WStar extends OpClip {
+
+}
+
+
+% Text object operators
+type OpTextObject extends Operator {
+
+}
+%OpTextObject->Op_ET, Op_BT
+
+% Text state operators
+type OpTextState extends Operator {
+
+}
+%OpTextState->Op_Tc, Op_Tw, Op_Tz, Op_TL, Op_Tf, Op_Tr, Op_Ts
+
+% Text position operators
+type OpTextPosition extends Operator {
+
+}
+
+% OpTextPosition->Op_Td, Op_TD, Op_Tm, Op_T*
+
+% Text show operators
+type OpTextShow extends Operator {
+
+}
+
+%OpTextShow->Op_Tj, Op_TJ, Op_', Op_"
+
+% Type3 font operators
+type OpType3Font extends Operator {
+
+}
+
+% OpType3Font->Op_d0, Op_d1
+
+% Color operators
+type OpColor extends Operator {
+
+}
+
+% Op_Color->Op_CS, Op_cs, Op_SC, Op_SCN, Op_sc, Op_scn, Op_G, Op_g, Op_RG, Op_rg, Op_K, Op_k
+
+% Shading operators
+type OpShading extends Operator {
+
+}
+
+% smooth shading operator
+type Op_sh extends OpShading {
+	% link to the corresponding Shading resource
+	link shading: PDShading;
+}
+
+% Inline image operators
+type OpInlineImage extends Operator {
+
+}
+
+% OpInlineImage->Op_BI, Op_ID, Op_EI
+
+% XObject operators
+type OpXObject extends Operator {
+
+}
+
+% XObject Do operator
+type Op_Do extends OpXObject {
+	% link to the corresponding XObject resource
+	link xObject: PDXObject;
+}
+
+
+% Marked content operators
+type OpMarkedContent extends Operator {
+
+}
+
+% define marked content point with properties
+type Op_MP extends OpMarkedContent {
+	% tag name
+	link tag: CosName;
+	% properties dictionary
+	link properties: CosDict;
+}
+
+% start marked content region
+type Op_BMC extends OpMarkedContent {
+	% tag name
+	link tag: CosName;
+}
+
+% start marked content region with properties
+type Op_BMC extends OpMarkedContent {
+	% tag name
+	link tag: CosName;
+	% properties dictionary
+	link properties: CosDict;
+}
+
+% end marked content region
+type Op_EMC extends OpMarkedContent {
+
+}
+
+% Compatibility operators
+type OpCompatibility extends Operator {
+
+}
+
+% begin compatibility region
+type Op_BX extends OpCompatibility {
+
+}
+
+% end compatibility region
+type Op_EX extends OpCompatibility {
+
 }

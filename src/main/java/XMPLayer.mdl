@@ -11,7 +11,9 @@ type XMPObject extends Object {
 % XMP package
 type XMPPackage extends XMPObject {
     % collection of all used schemas
-    link Schema: XMPSchema;
+    link Schemas: XMPSchema*;
+    % true if metadata is valid
+    property isMetadataValid: Boolean;
     % bytes attribute in header, null if it is not present
     property bytes: String;
     % encoding attribute in header, null if it is not present
@@ -32,22 +34,28 @@ type XMPSchema extends XMPObject {
     property prefix: String;
 }
 
+% XMP Predefined Schema
+type XMPPredefinedSchema extends XMPSchema {
+    % unknown properties names
+    property unknownProperties: String;
+    % wrong value types properties
+    property wrongValueTypeProperties: String;
+}
+
 % XMP custom schema
 type XMPCustomSchema extends XMPSchema {
     % true if custom schema definition complies PDF/A
     property isDefinitionCorrect: Boolean;
     % true if this custom schema defined in this xmp package
     property isDefinedInThisPackage: Boolean;
-    % true if this custom schema defined in main xmp package
-    property isDefinedInMainPackage: Boolean;
 }
 
-% Following six schemas have required prefix
+% Following two schemas have required prefix
 
 % PDF/A Identification Schema (NSURI: http://www.aiim.org/pdfa/ns/id/, required prefix: pdfaid)
-type PDFAIdSchema extends XMPSchema {
+type PDFAIdSchema extends XMPPredefinedSchema {
     % property part of pdfaid schema
-    property part: String;
+    property part: Integer;
     % property conformance of pdfaid schema
     property conformance: String;
     % property amd of pdfaid schema
@@ -57,34 +65,21 @@ type PDFAIdSchema extends XMPSchema {
 }
 
 % PDF/A Extension Schema Container Schema (NSURI: http://www.aiim.org/pdfa/ns/extension/, required prefix: pdfaExtension)
-type PDFAExtensionSchema extends XMPSchema {
-
-}
-
-% PDF/A Field Type Schema (NSURI: http://www.aiim.org/pdfa/ns/field#, required prefix: pdfaField)
-type PDFAFieldSchema extends XMPSchema {
-
-}
-
-% PDF/A Property Value Type (NSURI: http://www.aiim.org/pdfa/ns/property#, required prefix: pdfaProperty)
-type PDFAPropertySchema extends XMPSchema {
-
-}
-
-% PDF/A Schema Value Type (NSURI: http://www.aiim.org/pdfa/ns/schema#, required prefix: pdfaSchema)
-type PDFASchemaSchema extends XMPSchema {
-
-}
-
-% PDF/A ValueType Value Type (NSURI: http://www.aiim.org/pdfa/ns/type#, required prefix: pdfaType)
-type PDFATypeSchema extends XMPSchema {
-
+type PDFAExtensionSchema extends XMPPredefinedSchema {
+    % true if all properties corresponding to PDF/A Field Type Schema (NSURI: http://www.aiim.org/pdfa/ns/field#, required prefix: pdfaField) have required prefix
+    property isPDFAFieldPrefixCorrect: Boolean;
+    % true if all properties corresponding to PDF/A Property Value Type (NSURI: http://www.aiim.org/pdfa/ns/property#, required prefix: pdfaProperty) have required prefix
+    property isPDFAPropertyPrefixCorrect: Boolean;
+    % true if all properties corresponding to PDF/A Schema Value Type (NSURI: http://www.aiim.org/pdfa/ns/schema#, required prefix: pdfaSchema) have required prefix
+    property isPDFASchemaPrefixCorrect: Boolean;
+    % true if all properties corresponding to PDF/A ValueType Value Type (NSURI: http://www.aiim.org/pdfa/ns/type#, required prefix: pdfaType) have required prefix
+    property isPDFATypePrefixCorrect: Boolean;
 }
 
 % Following six schemas have false friends properties for PDF/A-1. Types of this schemas contains only false friends properties.
 
 % XMP Basic Schema (NSURI: http://ns.adobe.com/xap/1.0/, preferred prefix: xmp)
-type XMPBasicSchema extends XMPSchema {
+type XMPBasicSchema extends XMPPredefinedSchema {
     % property Author of xmp basic schema
     property author: String;
     % property Description of xmp basic schema
@@ -92,27 +87,25 @@ type XMPBasicSchema extends XMPSchema {
     % property Label of xmp basic schema
     property label: String;
     % property Rating of xmp basic schema
-    property rating: String;
+    property rating: Integer;
     % property Title of xmp basic schema
     property title: String;
 }
 
 % XMP Rights Management Schema (NSURI: http://ns.adobe.com/xap/1.0/rights/, preferred prefix: xmpRights)
-type XMPRightsSchema extends XMPSchema {
+type XMPRightsSchema extends XMPPredefinedSchema {
     % property Copyright of xmp rights management schema
     property copyright: String;
 }
 
 % XMP Media Management Schema (NSURI: http://ns.adobe.com/xap/1.0/mm/, preferred prefix: xmpMM)
-type XMPMMSchema extends XMPSchema {
-    % property InstanceID of xmp media management schema
-    property instanceID: String;
+type XMPMMSchema extends XMPPredefinedSchema {
     % property Manifest of xmp media management schema
     property manifest: String;
 }
 
 % XMP Paged-Text Schema (NSURI: http://ns.adobe.com/xap/1.0/t/pg/, preferred prefix: XMPTPg)
-type XMPTPgSchema extends XMPSchema {
+type XMPTPgSchema extends XMPPredefinedSchema {
     % property Colorants of xmp paged-text schema
     property colorants: String;
     % property Fonts of xmp paged-text schema
@@ -122,7 +115,7 @@ type XMPTPgSchema extends XMPSchema {
 }
 
 % Adobe PDF Schema (NSURI: http://ns.adobe.com/pdf/1.3/, preferred prefix: pdf)
-type PDFSchema extends XMPSchema {
+type PDFSchema extends XMPPredefinedSchema {
     % property Author of adobe pdf schema
     property author: String;
     % property BaseURL of adobe pdf schema
@@ -143,7 +136,7 @@ type PDFSchema extends XMPSchema {
 }
 
 % Photoshop Schema (NSURI: http://ns.adobe.com/photoshop/1.0/, preferred prefix: photoshop)
-type PhotoshopSchema extends XMPSchema {
+type PhotoshopSchema extends XMPPredefinedSchema {
     % property Author of photoshop schema
     property author: String;
     % property Copyright of photoshop schema
@@ -158,53 +151,21 @@ type PhotoshopSchema extends XMPSchema {
 % Following eight schemas are false friends for PDF/A-1
 
 % Camera Raw Schema (NSURI: http://ns.adobe.com/camera-rawsettings/1.0/, preferred prefix: crs)
-type CRSSchema extends XMPSchema {
+type CRSSchema extends XMPPredefinedSchema {
 
 }
 
 % EXIF Schema for Additional EXIF Preperties (NSURI: http://ns.adobe.com/exif/1.0/aux/, preferred prefix: aux)
-type AUXSchema extends XMPSchema {
-
-}
-
-% IPTC Core (NSURI: http://iptc.org/std/Iptc4xmpCore/1.0/xmlns/, preferred prefix: Iptc4xmpCore)
-type Iptc4xmpCoreSchema extends XMPSchema {
-
-}
-
-% PDF/E Identification Extension Schema (NSURI: http://www.aiim.org/pdfe/ns/id/, preferred prefix: pdfe)
-type PDFESchema extends XMPSchema {
-
-}
-
-% PDF Extension Schema (NSURI: http://ns.adobe.com/pdfx/1.3/, preferred prefix: pdfx)
-type PDFXSchema extends XMPSchema {
-
-}
-
-% PDF/X Identification Extension Schema (NSURI: http://www.npes.org/pdfx/ns/id/, preferred prefix: pdfxid)
-type PDFXIdSchema extends XMPSchema {
+type AUXSchema extends XMPPredefinedSchema {
 
 }
 
 % XMP Dynamic Media Schema (NSURI: http://ns.adobe.com/xmp/1.0/DynamicMedia/, preferred prefix: xmpDM)
-type XMPDMSchema extends XMPSchema {
+type XMPDMSchema extends XMPPredefinedSchema {
 
 }
 
-% XMP Support Schema Schema (NSURI: , preferred prefix: xapS)
-type XAPSSchema extends XMPSchema {
-
-}
-
-% Following two auxiliary schemas are false friends for PDF/A-1
-
-% Field Schema for the "Colorant" Value Type (NSURI: http://ns.adobe.com/xap/1.0/g/, preferred prefix: xapG)
-type XAPGSchema extends XMPSchema {
-
-}
-
-% Field Schema for the "Font" Value Type (NSURI: http:ns.adobe.com/xap/1.0/sType/Font#, preferred prefix: stFnt)
-type StFntSchema extends XMPSchema {
+% XMP Support Schema Schema (NSURI: http://ns.adobe.com/xap/1.0/s/, preferred prefix: xapS)
+type XAPSSchema extends XMPPredefinedSchema {
 
 }
